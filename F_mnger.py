@@ -1,45 +1,33 @@
+# - *- coding: utf- 8 - *-
 import telebot
 import requests
-import time
-from bs4 import BeautifulSoup
+#import time
+#from bs4 import BeautifulSoup
 from telebot import types
 
+def Currency():
 
-class Currency:
-    ETH_RUB = 'https://www.investing.com/crypto/currency-pairs?exchange=1029&c1=195&c2=79'
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
-
-    current_table_price = 0
-    difference = 1000
-
-    def __init__(self):
-        self.current_table_price = float(self.get_currency_price().replace(',', ''))
-
-    def get_currency_price(self):
-
-        full_page = requests.get(self.ETH_RUB, headers=self.headers)
-
-        soup = BeautifulSoup(full_page.content, 'html.parser')
-
-        table = soup.find('td', {'class': 'pid-1031730-last'})
-
-        return table.text
-
-    def check_currency(self):
-        currency = float(self.get_currency_price().replace(',', ''))
-        if currency >= self.current_table_price + self.difference:
-            print("Курс поднялся!")
-        elif currency <= self.current_table_price - self.difference:
-            print("Курс опустился!")
-        print("Курс Эфира сейчас: " + str(currency) + " RUB")
-        #time.sleep(60)
-        #self.check_currency()
-
-    def kurs(self):
-        return self.current_table_price
+    #ETH_RUB = 'https://www.investing.com/crypto/currency-pairs?exchange=1029&c1=195&c2=79'
+    #headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
 
 
-currency = Currency()
+    url = "https://api.exmo.com/v1.1/ticker"
+
+    payload = {}
+    headers = {
+    'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    response = requests.request("POST", url, headers=headers, data = payload)
+    parse_date = response.json()
+    currency = parse_date["ETH_RUB"]
+
+    curren_ETH = currency['last_trade']
+
+    return curren_ETH
+    #print(currency['last_trade'])
+
+
 
 bot = telebot.TeleBot("1180230199:AAGO1Qyqc_aKD4BSbusz8IgpYB7OvgrmYmg")
 
@@ -54,9 +42,8 @@ def start_message(message):
 
 @bot.message_handler(content_types=["text"])
 def ETH_messages(message):
-    k_ETH = str(currency.kurs())
+    k_ETH = str(Currency())
     #if message.text == 'Курс эфира':
     bot.send_message(message.chat.id, k_ETH)
-
 
 bot.polling(none_stop=True)
