@@ -7,10 +7,6 @@ from telebot import types
 
 def Currency():
 
-    #ETH_RUB = 'https://www.investing.com/crypto/currency-pairs?exchange=1029&c1=195&c2=79'
-    #headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
-
-
     url = "https://api.exmo.com/v1.1/ticker"
 
     payload = {}
@@ -22,10 +18,10 @@ def Currency():
     parse_date = response.json()
     currency = parse_date["ETH_RUB"]
 
-    curren_ETH = currency['last_trade']
+    curren_ETH = round(float(currency['last_trade']), 3)
 
     return curren_ETH
-    #print(currency['last_trade'])
+    
 
 
 
@@ -42,8 +38,10 @@ def start_message(message):
 
 @bot.message_handler(content_types=["text"])
 def ETH_messages(message):
-    k_ETH = str(Currency())
-    #if message.text == 'Курс эфира':
-    bot.send_message(message.chat.id, k_ETH)
+    ETH_RUB = f"<b>{str(Currency())}</b>" + ' RUB'
+    if message.text == 'Курс эфира':
+        bot.send_message(message.chat.id, ETH_RUB, parse_mode='html')
+    else:
+        bot.send_message(message.chat.id, "Я исполняю только жёсткие инструкции, а не ВОТ ЭТО ВОТ ВСЁ!!!")
 
 bot.polling(none_stop=True)
